@@ -18,7 +18,7 @@ namespace ExeRunner.Lib.Recovery
         NoAction
     }
 
-    public class ExeRecoveryContext
+    public sealed class ExeRecoveryContext
     {
         public int FailCount { get; set; }
         public DateTime Date { get; set; }

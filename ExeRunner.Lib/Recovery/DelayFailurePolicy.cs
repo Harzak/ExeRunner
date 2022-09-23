@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Recovery
 {
-    internal class DelayFailurePolicy
+    public sealed class DelayFailurePolicy
     {
+        public DelayFailurePolicy()
+        {
+
+        }
     }
 }

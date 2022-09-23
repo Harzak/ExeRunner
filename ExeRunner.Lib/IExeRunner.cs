@@ -8,5 +8,6 @@ namespace ExeRunner.Lib
 {
     internal interface IExeRunner
     {
+
     }
 }

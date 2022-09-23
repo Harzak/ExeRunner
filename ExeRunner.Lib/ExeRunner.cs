@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib
 {
-    public class ExeRunner
+    public class ExeRunner : IExeWatcher
     {
     }
 }
