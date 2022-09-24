@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Recovery
 {
-    public sealed class DelayFailurePolicy
+    public enum EExeRecoveryAction
     {
-        public DelayFailurePolicy()
-        {
-
-        }
+        Restart,
+        RunOtherProgram,
+        NoAction
     }
 }

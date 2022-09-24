@@ -8,6 +8,8 @@ namespace ExeRunner.Lib
 {
     internal interface IExeRunner
     {
-
+        public bool Run(string[] args); 
+        public Task<bool> RunAsync(string[] args);
+        public bool Stop();
     }
 }

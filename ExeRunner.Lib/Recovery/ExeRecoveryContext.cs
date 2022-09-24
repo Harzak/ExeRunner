@@ -6,18 +6,6 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Recovery
 {
-    public interface IExeRecoveryPolicy
-    {
-        ExeRecoveryAction GetNextRecoveryAction(ExeRecoveryContext context); //failcount is incremented by the main class
-    }
-
-    public enum ExeRecoveryAction
-    {
-        Restart,
-        RunOtherProgram,
-        NoAction
-    }
-
     public sealed class ExeRecoveryContext
     {
         public int FailCount { get; set; }

@@ -15,9 +15,10 @@ namespace ExeRunner.Lib.Recovery
             _maxRetry = maxRetry;   
         }
 
-        public ExeRecoveryAction GetNextRecoveryAction(ExeRecoveryContext context)
+        public RecoveryPolicyModel GetNextRecoveryAction(ExeRecoveryContext context)
         {
-            return context.FailCount < _maxRetry ? ExeRecoveryAction.Restart : ExeRecoveryAction.NoAction;
+            EExeRecoveryAction action = context.FailCount < _maxRetry ? EExeRecoveryAction.Restart : EExeRecoveryAction.NoAction;
+            return new RecoveryPolicyModel(_maxRetry, TimeSpan.FromMilliseconds(1), action);
         }
     }
 }
