@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Recovery
 {
-    public class DelayRetryPolicy : IExeRecoveryPolicy
+    public class DelayRecoveryPolicy : IExeRecoveryPolicy
     {
         private readonly Dictionary<int, TimeSpan> _tempoRetry;
 
-        public DelayRetryPolicy()
+        public DelayRecoveryPolicy()
         {
             _tempoRetry = new Dictionary<int, TimeSpan>()
             {
@@ -21,10 +21,10 @@ namespace ExeRunner.Lib.Recovery
             };
         }
 
-        public RecoveryPolicyModel GetNextRecoveryAction(ExeRecoveryContext context)
+        public RecoveryStrategieModel GetRecoveryStrategy(ExeRecoveryContext context)
         {
-            TimeSpan delay = _tempoRetry.First(x => context.FailCount<= x.Key).Value;
-            return new RecoveryPolicyModel(540, delay, EExeRecoveryAction.Restart);
+            TimeSpan delay = _tempoRetry.First(x => context.FailCount <= x.Key).Value;
+            return new RecoveryStrategieModel(540, delay, EExeRecoveryAction.Restart);
         }
     }
 }

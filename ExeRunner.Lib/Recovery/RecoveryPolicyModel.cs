@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Recovery
 {
-    public class RecoveryPolicyModel
+    public class RecoveryStrategieModel
     {
         public int MaxRetry { get; set; }
         public TimeSpan Delay { get; set; }
         public EExeRecoveryAction Action { get; set; }
 
-        public RecoveryPolicyModel(int maxRetry, TimeSpan delay, EExeRecoveryAction action)
+        public RecoveryStrategieModel(int maxRetry, TimeSpan delay, EExeRecoveryAction action)
         {
             MaxRetry = maxRetry;
             Delay = delay;

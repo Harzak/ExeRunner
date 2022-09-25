@@ -8,6 +8,6 @@ namespace ExeRunner.Lib.Recovery
 {
     public interface IExeRecoveryPolicy
     {
-        RecoveryPolicyModel GetNextRecoveryAction(ExeRecoveryContext context); //failcount is incremented by the main class
+        RecoveryStrategieModel GetRecoveryStrategy(ExeRecoveryContext context); //failcount is incremented by the main class
     }
 }

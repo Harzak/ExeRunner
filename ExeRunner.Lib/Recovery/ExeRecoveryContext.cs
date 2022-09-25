@@ -10,6 +10,6 @@ namespace ExeRunner.Lib.Recovery
     {
         public int FailCount { get; set; }
         public DateTime Date { get; set; }
-        public Exception? Reason { get; set; }
+        public Exception Reason { get; set; }
     }
 }

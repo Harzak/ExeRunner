@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Recovery
 {
-    public sealed class SimpleFailurePolicy : IExeRecoveryPolicy
+    public sealed class SimpleRecoveryPolicy : IExeRecoveryPolicy
     {
         private int _maxRetry;
 
-        public SimpleFailurePolicy(int maxRetry)
+        public SimpleRecoveryPolicy(int maxRetry)
         {
             _maxRetry = maxRetry;   
         }
 
-        public RecoveryPolicyModel GetNextRecoveryAction(ExeRecoveryContext context)
+        public RecoveryStrategieModel GetRecoveryStrategy(ExeRecoveryContext context)
         {
             EExeRecoveryAction action = context.FailCount < _maxRetry ? EExeRecoveryAction.Restart : EExeRecoveryAction.NoAction;
-            return new RecoveryPolicyModel(_maxRetry, TimeSpan.FromMilliseconds(1), action);
+            return new RecoveryStrategieModel(_maxRetry, TimeSpan.FromMilliseconds(1), action);
         }
     }
 }
