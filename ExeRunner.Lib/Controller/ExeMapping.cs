@@ -8,19 +8,18 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Controller
 {
-    public class ExeMapping : ConcurrentDictionary<Guid, IExeRunner>, IDictionary<Guid, IExeRunner>, IDisposable
+    public class RunnerCollection : ConcurrentBag<IExeRunner>, IEnumerable<IExeRunner>, IDisposable
     {
         public void Dispose()
         {
             if (!IsEmpty)
             {
-                foreach (KeyValuePair<Guid, IExeRunner> item in this)
+                foreach (IExeRunner item in this)
                 {
-                    item.Value?.Dispose();
+                    item?.Dispose();
                 }
+                TryTake(out _);
             }
-
-            Clear();
         }
     }
 }

@@ -6,23 +6,28 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.ExeWatcher
 {
-    public class ExeWatcher : IExeWatcher
+    internal class ExeWatcher : IExeWatcher
     {
         private int _pid;
 
-        public ExeWatcher(int pid)
+        internal ExeWatcher(int pid)
         {
             _pid = pid;
         }
 
         public event EventHandler<ExeWatcherEventArgs> ExeTerminatedAbnormally;
 
+        public void Dispose()
+        {
+           
+        }
+
         private void stopped()
         {
             ExeTerminatedAbnormally?.Invoke(this, new ExeWatcherEventArgs(_pid));
         }
     }
-    public enum EExeStates
+    internal enum EExeStates
     {
         Starting,
         Started,

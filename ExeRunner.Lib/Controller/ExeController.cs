@@ -8,46 +8,43 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.Controller
 {
-    public class ExeController : IDisposable    
+    public class ExeController : IDisposable
     {
-        private readonly IExeRunnerFactory _runnerFactory;
-        private readonly ExeMapping _exeMapping;
+        protected IExeRunnerFactory RunnerFactory { get; }
+        private readonly RunnerCollection _runners;
         private bool disposedValue;
 
         public ExeController(IExeRunnerFactory runnerFactory)
         {
-            _runnerFactory = runnerFactory;
-            _exeMapping = new ExeMapping();
+            RunnerFactory = runnerFactory;
+            _runners = new RunnerCollection();
         }
 
-        public Guid RunZenit(List<string> args)
+        public Guid Register(ExeLaunchOptions launchOptions)
         {
-            //get free port and add as argument
-            string port = "2568";
-            args.Add(port);
-            IExeRunner runner = _runnerFactory.CreateRunner(new ExeLaunchOptions()
-            {                 
-                NoWindow = false,
-                Path = @"C:\Workspaces\Sandbox\ConsoleApps_NET_472\TestExeRunner\bin\Debug\net472\TestExeRunner.exe",
-            });
+            IExeRunner runner = RunnerFactory.CreateRunner(launchOptions);
+            _runners.Add(runner);
+            return runner.Id;
+        }
 
-            Guid id = Guid.NewGuid();
-            if (_exeMapping.TryAdd(id, runner))
+        public bool Run(Guid idExe, string[] args)
+        {
+            if (_runners.Any(x => x.Id == idExe))
             {
-                runner.Run(args.ToArray());
-                return id;
-            } 
-            return Guid.Empty;          
+               return _runners.First(x => x.Id == idExe)
+                        .Run(args);
+            }
+            return false;
         }
 
         public bool Stop(Guid idExe)
         {
-            if (_exeMapping.Any(x => x.Key == idExe))
+            if (_runners.Any(x => x.Id == idExe))
             {
-                IExeRunner runner = _exeMapping[idExe];
+                IExeRunner runner = _runners.First(x => x.Id == idExe);
                 runner.Stop();
                 runner.Dispose();
-                _exeMapping.TryRemove(idExe, out _);
+                _runners.TryTake(out runner);
             }
             return true;
         }
@@ -58,11 +55,12 @@ namespace ExeRunner.Lib.Controller
             {
                 if (disposing)
                 {
-                    _exeMapping?.Dispose();
+                    _runners?.Dispose();
                 }
                 disposedValue=true;
             }
         }
+
         public void Dispose()
         {
             Dispose(disposing: true);

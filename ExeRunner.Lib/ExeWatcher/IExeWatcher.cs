@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.ExeWatcher
 {
-    public interface IExeWatcher
+    public interface IExeWatcher : IDisposable
     {
        event EventHandler<ExeWatcherEventArgs> ExeTerminatedAbnormally;
     }

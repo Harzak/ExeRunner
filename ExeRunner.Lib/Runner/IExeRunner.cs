@@ -9,6 +9,7 @@ namespace ExeRunner.Lib.Runner
 {
     public interface IExeRunner : IDisposable
     {
+        Guid Id { get; }
         int PID { get; }
 
         bool Run(string[] args);

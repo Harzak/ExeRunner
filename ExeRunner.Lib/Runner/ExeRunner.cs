@@ -14,26 +14,35 @@ namespace ExeRunner.Lib.Runner
 {
     public class ExeRunner : IExeRunner, IDisposable
     {
+        private bool disposedValue;
         private readonly IExeRecoveryPolicy _recoveryPolicy;
         private readonly IExeWatcherFactory _watcherFactory;
         private readonly string _path;
-        private bool _noWindow;
+        private readonly bool _noWindow;
+        private readonly int _failCount;
+        private readonly Guid _id;
+
         private int _tryRunCount;
-        private int _failCount;
         private string[] _args;
         private Func<bool> _batchStopProcess;
+        private IExeWatcher _watcher;
 
         private Process _process;
-        private bool disposedValue;
 
         public int PID
         {
             get => _process?.Id ?? -1;
         }
 
+        public Guid Id
+        {
+            get => _id;
+        }
+
         public ExeRunner(string exePath, IExeWatcherFactory watcherFactory)
         {
             _path = exePath;
+            _id = Guid.NewGuid();
             _watcherFactory = watcherFactory;
             _noWindow = false;
             _recoveryPolicy = new SimpleRecoveryPolicy(0);
@@ -52,6 +61,11 @@ namespace ExeRunner.Lib.Runner
             _recoveryPolicy = recoveryPolicy ?? new SimpleRecoveryPolicy(0);
         }
 
+        public Task<bool> RunAsync(string[] args, CancellationToken cancellation)
+        {
+            return Task.Run(() => Run(args), cancellation);
+        }
+
         public bool Run(string[] args)
         {
             _args = args;
@@ -61,7 +75,7 @@ namespace ExeRunner.Lib.Runner
         private bool RunInternal(TimeSpan wait)
         {
             Thread.Sleep(wait);
-            bool failed;
+            bool failed = false;
             _tryRunCount++;
 
             _process = new Process()
@@ -80,10 +94,7 @@ namespace ExeRunner.Lib.Runner
             try
             {
                 _process.Start();
-                IExeWatcher exeWatcher = _watcherFactory.CreateExeWatcher(PID);
-                exeWatcher.ExeTerminatedAbnormally += OnProcessTerminatedAbnormally;
                 _process.Exited += OnProcessExited;
-                return true;
             }
             catch (Exception ex)
             {
@@ -94,24 +105,19 @@ namespace ExeRunner.Lib.Runner
             {
                 RunInternal(TimeSpan.FromSeconds(20));
             }
+            else if (failed)
+            {
+                return false;
+            }
 
-            return false;
+            _watcher = _watcherFactory.CreateExeWatcher(PID);
+            _watcher.ExeTerminatedAbnormally += OnProcessTerminatedAbnormally;
+            return true;
         }
 
-        private void OnProcessExited(object sender, EventArgs e)
+        public Task<bool> StopAsync(CancellationToken cancellation)
         {
-            _process?.Close();
-            _process?.Dispose();
-        }
-
-        private void OnProcessTerminatedAbnormally(object sender, ExeWatcherEventArgs e)
-        {
-            Recover();
-        }
-
-        public Task<bool> RunAsync(string[] args, CancellationToken cancellation)
-        {
-            return Task.Run(() => Run(args), cancellation);
+            return Task.Run(() => Stop(), cancellation);
         }
 
         public bool Stop()
@@ -151,12 +157,7 @@ namespace ExeRunner.Lib.Runner
             return true;
         }
 
-        public Task<bool> StopAsync(CancellationToken cancellation)
-        {
-            return Task.Run(() => Stop(), cancellation);
-        }
-
-        public ExeRunner ExecuteToStop(Func<bool> action)
+        public ExeRunner ExecuteOnStop(Func<bool> action)
         {
             _batchStopProcess = action;
             return this;
@@ -169,6 +170,7 @@ namespace ExeRunner.Lib.Runner
                 Date = DateTime.Now,
                 FailCount = _failCount,
             });
+
             switch (recoveryStrategy.Action)
             {
                 case EExeRecoveryAction.Restart:
@@ -176,7 +178,19 @@ namespace ExeRunner.Lib.Runner
                 default:
                     break;
             }
+
             return true;
+        }
+
+        private void OnProcessExited(object sender, EventArgs e)
+        {
+            _process?.Close();
+            _process?.Dispose();
+        }
+
+        private void OnProcessTerminatedAbnormally(object sender, ExeWatcherEventArgs e)
+        {
+            Recover();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -186,16 +200,17 @@ namespace ExeRunner.Lib.Runner
                 if (disposing)
                 {
                     _process?.Dispose();
+                    _watcher?.Dispose();
                 }
                 _process.Exited -= OnProcessExited;
-                _batchStopProcess = null;
+                _batchStopProcess = null;              
                 disposedValue = true;
             }
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
     }

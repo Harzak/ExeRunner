@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExeRunner.Lib.ExeWatcher
 {
-    internal class ExeWatcherFactory : IExeWatcherFactory
+    public class ExeWatcherFactory : IExeWatcherFactory
     {
         public IExeWatcher CreateExeWatcher(int pid)
         {
