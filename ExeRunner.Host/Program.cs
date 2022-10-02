@@ -17,11 +17,12 @@ namespace ExeRunner
             {
                 Console.WriteLine("Start");
                 controller.RunZenitExe(new List<string> { "test", "111", "test2", "22" });
-                Console.WriteLine("Sleep");
-                Thread.Sleep(6000);
-                Console.WriteLine("try to stop");
-                controller.StopZenitExe();
-                Console.WriteLine("Stopped");
+                //Console.WriteLine("Sleep");
+
+                //Console.WriteLine("try to stop");
+                //controller.StopZenitExe();
+                //Console.WriteLine("Stopped");
+
             }
             
             Console.ReadKey();

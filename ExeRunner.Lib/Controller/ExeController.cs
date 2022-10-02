@@ -29,24 +29,33 @@ namespace ExeRunner.Lib.Controller
 
         public bool Run(Guid idExe, string[] args)
         {
-            if (_runners.Any(x => x.Id == idExe))
+            IExeRunner runner = GetRunner(idExe);
+            if (runner != null)
             {
-               return _runners.First(x => x.Id == idExe)
-                        .Run(args);
+                runner.Run(args);
             }
             return false;
         }
 
         public bool Stop(Guid idExe)
         {
-            if (_runners.Any(x => x.Id == idExe))
+            IExeRunner runner = GetRunner(idExe);
+            if (runner != null)
             {
-                IExeRunner runner = _runners.First(x => x.Id == idExe);
                 runner.Stop();
                 runner.Dispose();
                 _runners.TryTake(out runner);
             }
             return true;
+        }
+
+        protected IExeRunner GetRunner(Guid id)
+        {
+            if (_runners.Any(x => x.Id == id))
+            {
+                return _runners.First(x => x.Id == id);
+            }
+            return null;
         }
 
         protected virtual void Dispose(bool disposing)

@@ -8,4 +8,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.Management" />
+  </ItemGroup>
+
 </Project>

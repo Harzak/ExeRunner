@@ -94,6 +94,7 @@ namespace ExeRunner.Lib.Runner
             try
             {
                 _process.Start();
+                _process.EnableRaisingEvents = true;
                 _process.Exited += OnProcessExited;
             }
             catch (Exception ex)
@@ -110,9 +111,16 @@ namespace ExeRunner.Lib.Runner
                 return false;
             }
 
+            _process.Exited +=_process_Exited;
             _watcher = _watcherFactory.CreateExeWatcher(PID);
+            _watcher.StartAsync(cancellationToken: default);
             _watcher.ExeTerminatedAbnormally += OnProcessTerminatedAbnormally;
             return true;
+        }
+
+        private void _process_Exited(object sender, EventArgs e)
+        {
+            var ee = 11;
         }
 
         public Task<bool> StopAsync(CancellationToken cancellation)
